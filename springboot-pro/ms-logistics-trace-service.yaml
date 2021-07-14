@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-logistics-trace-service-pro
+  namespace: springboot-pro
+  labels:
+    app: ms-logistics-trace-service-pro
+spec:
+  ports:
+    - port: 9104
+      name: ms-logistics-trace-service-pro
+  clusterIP: None
+  selector:
+    app: ms-logistics-trace-service-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-logistics-trace-service-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "ms-logistics-trace-service-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-logistics-trace-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-logistics-trace-service-pro
+    spec:
+      containers:
+        - name: ms-logistics-trace-service-pro
+          image: 192.168.5.4:82/csbr/ms-logistics-trace-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9104
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

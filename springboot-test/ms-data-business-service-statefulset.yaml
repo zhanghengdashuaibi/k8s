@@ -1,0 +1,43 @@
+# ms-data-business-service.yaml
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ms-data-business-service-test
+#   namespace: springboot-test
+#   labels:
+#     app: ms-data-business-service-test
+# spec:
+#   type: ClusterIP
+#   ports:
+#     - port: 9201
+#       name: ms-data-business-service-test
+#       targetPort: 9201
+#   selector:
+#     app: ms-data-business-service-test
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-data-business-service-test
+  namespace: springboot-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ms-data-business-service-test
+  template:
+    metadata:
+      labels:
+        app: ms-data-business-service-test
+    spec:
+      containers:
+        - name: ms-data-business-service-test
+          image: 192.168.5.4:82/csbr/ms-data-business-service-test:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9201
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"

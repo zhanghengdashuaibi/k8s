@@ -1,0 +1,1 @@
+kubectl create secret tls https-test-ingress-secret --cert=SSLCity.crt --key=star.csbr.cn.key -n springboot-test

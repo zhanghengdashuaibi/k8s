@@ -1,0 +1,63 @@
+# 服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: showdoc-service
+  namespace: dev-ops
+  labels:
+    app: showdoc-service
+spec:
+  type: NodePort
+  ports:
+  - name: showdoc-port
+    protocol: TCP
+    port: 4999
+    targetPort: 80
+    nodePort: 34999
+  selector:
+    app: showdoc
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: showdoc
+  namespace: dev-ops
+spec:
+  serviceName: showdoc-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: showdoc
+  template:
+    metadata:
+      labels:
+        app: showdoc
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: showdoc
+        image: "star7th/showdoc:v2.8.11"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200M
+          limits:
+            cpu: 100m
+            memory: 512M
+        ports:
+            - name: showdoc-port
+              containerPort: 80
+              protocol: "TCP"
+        volumeMounts:
+          - name: showdoc-data
+            mountPath: /var/www/html
+  volumeClaimTemplates:
+  - metadata:
+      name: showdoc-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: common-storage
+      resources:
+        requests:
+          storage: 5Gi

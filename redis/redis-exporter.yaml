@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: redis-exporter
+  namespace: redis
+  labels:
+    app: redis-exporter
+spec:
+  selector:
+    matchLabels:
+      app: redis-exporter
+  template:
+    metadata:
+      name: redis-exporter
+      labels:
+        app: redis-exporter
+    spec:
+      containers:
+        - name: redis-exporter
+          image: oliver006/redis_exporter:latest
+        - args:
+            - '-redis.addr'
+            - 'redis://redis-app-5.redis-service.redis:6379'
+            - 'redis://redis-app-4.redis-service.redis:6379'
+            - 'redis://redis-app-3.redis-service.redis:6379'
+            - 'redis://redis-app-2.redis-service.redis:6379'
+            - 'redis://redis-app-1.redis-service.redis:6379'
+            - 'redis://redis-app-0.redis-service.redis:6379'
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - containerPort: 9121
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-exporter
+  namespace: redis
+spec:
+  selector:
+    app: redis-exporter
+  type: NodePort
+  ports:
+    - name: prom
+      port: 9121
+      targetPort: 9121
+      nodePort: 31673
+      protocol: TCP

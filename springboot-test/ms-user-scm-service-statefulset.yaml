@@ -1,0 +1,44 @@
+# ms-user-scm-service-statefulset.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-user-scm-service-test
+  namespace: springboot-test
+  labels:
+    app: ms-user-scm-service-test
+spec:
+  ports:
+    - port: 9001
+      name: ms-user-scm-service-test
+  clusterIP: None
+  selector:
+    app: ms-user-scm-service-test
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-user-scm-service-test
+  namespace: springboot-test
+spec:
+  serviceName: "ms-user-scm-service-test"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-user-scm-service-test
+  template:
+    metadata:
+      labels:
+        app: ms-user-scm-service-test
+    spec:
+      containers:
+        - name: ms-user-scm-service-test
+          image: 192.168.5.4:82/csbr/ms-user-scm-service-test:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9001
+          resources:
+            requests:
+              cpu: "50m"                     
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

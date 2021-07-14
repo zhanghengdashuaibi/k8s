@@ -1,0 +1,47 @@
+# camunda-server.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camunda-server-pro
+  namespace: springboot-pro
+  labels:
+    app: camunda-server-pro
+spec:
+  type: NodePort  
+  ports:
+    - port: 8090
+      name: camunda-server-pro
+      nodePort: 8090
+  selector:
+    app: camunda-server-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: camunda-server-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "camunda-server"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: camunda-server-pro
+  template:
+    metadata:
+      labels:
+        app: camunda-server-pro
+    spec:
+      containers:
+        - name: camunda-server-pro
+          image: 192.168.5.4:82/csbr/camunda-server-pro:1.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          resources:                                  
+            requests:
+              cpu: "200m"                     
+              memory: "256Mi"
+      nodeSelector:
+        zipkin: zipkin              
+  podManagementPolicy: "Parallel"

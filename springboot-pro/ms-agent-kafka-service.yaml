@@ -1,0 +1,44 @@
+# ms-agent-kafka-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-agent-kafka-service-pro
+  namespace: springboot-pro
+  labels:
+    app: ms-agent-kafka-service-pro
+spec:
+  ports:
+    - port: 9090
+      name: ms-agent-kafka-service-pro
+  clusterIP: None
+  selector:
+    app: ms-agent-kafka-service-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-agent-kafka-service-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "ms-agent-kafka-service-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-agent-kafka-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-agent-kafka-service-pro
+    spec:
+      containers:
+        - name: ms-agent-kafka-service-pro
+          image: 192.168.5.4:82/csbr/ms-agent-kafka-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

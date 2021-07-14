@@ -1,0 +1,44 @@
+# ms-user-unified-authentication-service-statefulset.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-user-unified-authentication-service-pro
+  namespace: springboot-pro
+  labels:
+    app: ms-user-unified-authentication-service-pro
+spec:
+  ports:
+    - port: 9999
+      name: ms-user-unified-authentication-service-pro
+  clusterIP: None
+  selector:
+    app: ms-user-unified-authentication-service-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-user-unified-authentication-service-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "ms-user-unified-authentication-service-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-user-unified-authentication-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-user-unified-authentication-service-pro
+    spec:
+      containers:
+        - name: ms-user-unified-authentication-service-pro
+          image: 192.168.5.4:82/csbr/ms-user-unified-authentication-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9999
+          resources:
+            requests:
+              cpu: "50m"                     
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

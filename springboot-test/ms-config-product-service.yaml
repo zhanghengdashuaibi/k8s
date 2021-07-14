@@ -1,0 +1,44 @@
+# ms-config-product-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-config-product-service-test
+  namespace: springboot-test
+  labels:
+    app: ms-config-product-service-test
+spec:
+  ports:
+    - port: 9105
+      name: ms-config-product-service-test
+  clusterIP: None
+  selector:
+    app: ms-config-product-service-test
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-config-product-service-test
+  namespace: springboot-test
+spec:
+  serviceName: "ms-config-product-service-test"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-config-product-service-test
+  template:
+    metadata:
+      labels:
+        app: ms-config-product-service-test
+    spec:
+      containers:
+        - name: ms-config-product-service-test
+          image: 192.168.5.4:82/csbr/ms-config-product-service-test:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9105
+          resources:                                  
+            requests:                         
+              cpu: "50m"                      
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

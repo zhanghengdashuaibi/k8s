@@ -1,0 +1,46 @@
+# ms-common-admin-cloud-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-common-admin-cloud-service-pro
+  namespace: springboot-pro
+  labels:
+    app: ms-common-admin-cloud-service-pro
+spec:
+  ports:
+    - port: 9101
+      name: ms-common-admin-cloud-service-pro
+  clusterIP: None
+  selector:
+    app: ms-common-admin-cloud-service-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-common-admin-cloud-service-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "ms-common-admin-cloud-service-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-common-admin-cloud-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-common-admin-cloud-service-pro
+    spec:
+      containers:
+        - name: ms-common-admin-cloud-service-pro
+          image: 192.168.5.4:82/csbr/ms-common-admin-cloud-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9101
+          resources:                                  
+            requests:                         
+              cpu: "200m"                      
+              memory: "256Mi"
+      nodeSelector:
+        zipkin: zipkin              
+  podManagementPolicy: "Parallel"

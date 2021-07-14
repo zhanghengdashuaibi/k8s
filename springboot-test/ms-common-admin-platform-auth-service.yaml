@@ -1,0 +1,44 @@
+# ms-common-admin-platform-auth-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-common-admin-platform-auth-service-test
+  namespace: springboot-test
+  labels:
+    app: ms-common-admin-platform-auth-service-test
+spec:
+  ports:
+    - port: 9102
+      name: ms-common-admin-platform-auth-service-test
+  clusterIP: None
+  selector:
+    app: ms-common-admin-platform-auth-service-test
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-common-admin-platform-auth-service-test
+  namespace: springboot-test
+spec:
+  serviceName: "ms-common-admin-platform-auth-service-test"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-common-admin-platform-auth-service-test
+  template:
+    metadata:
+      labels:
+        app: ms-common-admin-platform-auth-service-test
+    spec:
+      containers:
+        - name: ms-common-admin-platform-auth-service-test
+          image: 192.168.5.4:82/csbr/ms-common-admin-platform-auth-service-test:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9102
+          resources:                                  
+            requests:
+              cpu: "50m"                     
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

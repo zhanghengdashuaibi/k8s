@@ -1,0 +1,60 @@
+# ms-user-scm-service-statefulset.yaml
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ms-user-scm-service-pro
+#   namespace: springboot-pro
+#   labels:
+#     app: ms-user-scm-service-pro
+# spec:
+#   ports:
+#     - port: 9001
+#       name: ms-user-scm-service-pro
+#   clusterIP: None
+#   selector:
+#     app: ms-user-scm-service-pro
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-user-scm-service-pro
+  namespace: springboot-pro
+spec:
+  # serviceName: "ms-user-scm-service-pro"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ms-user-scm-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-user-scm-service-pro
+    spec:
+      # 反亲和配置，副本尽量不在同一个node上部署
+      affinity:
+        podAntiAffinity:
+          # 使用软策略
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ms-user-scm-service-pro
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: ms-user-scm-service-pro
+          image: 192.168.5.4:82/csbr/ms-user-scm-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9001
+          resources:
+            requests:
+              cpu: "200m"                     
+              memory: "1024Mi"
+  #     nodeSelector:
+  #       zipkin: zipkin              
+  # podManagementPolicy: "Parallel"

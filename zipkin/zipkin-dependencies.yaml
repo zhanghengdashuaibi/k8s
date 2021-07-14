@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin-dependencies
+  namespace: zipkin
+  labels:
+    name: zipkin-dependencies
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin-dependencies
+  template:
+    metadata:
+      labels:
+        app: zipkin-dependencies
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin-dependencies:2.3.1
+        ports:
+        - containerPort: 80
+        command: ["sh","-c","crond -f"]         
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        - name: STORAGE_TYPE
+          value: "elasticsearch"
+        - name: ES_HOSTS
+          value: "es-out.es:9200"
+        - name: ES_INDEX
+          value: "zipkin"
+        resources: 
+          requests:
+            cpu: 200m
+            memory: 256Mi

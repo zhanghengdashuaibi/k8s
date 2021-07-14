@@ -1,0 +1,44 @@
+# ms-agent-kafka-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-agent-kafka-service-test
+  namespace: springboot-test
+  labels:
+    app: ms-agent-kafka-service-test
+spec:
+  ports:
+    - port: 9090
+      name: ms-agent-kafka-service-test
+  clusterIP: None
+  selector:
+    app: ms-agent-kafka-service-test
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-agent-kafka-service-test
+  namespace: springboot-test
+spec:
+  serviceName: "ms-agent-kafka-service-test"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-agent-kafka-service-test
+  template:
+    metadata:
+      labels:
+        app: ms-agent-kafka-service-test
+    spec:
+      containers:
+        - name: ms-agent-kafka-service-test
+          image: 192.168.5.4:82/csbr/ms-agent-kafka-service-test:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

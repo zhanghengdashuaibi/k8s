@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server-pro
+  namespace: springboot-pro
+  labels:
+    app: eureka-server-pro
+spec:
+  type: NodePort
+  ports:
+    - port: 8761
+      name: eureka-server-pro
+      nodePort: 8761
+  selector:
+    app: eureka-server-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eureka-server-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "eureka-server-pro"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eureka-server-pro
+  template:
+    metadata:
+      labels:
+        app: eureka-server-pro
+    spec:
+      containers:
+        - name: eureka-server-pro
+          image: 192.168.5.4:82/csbr/eureka-server-pro:1.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8761
+          resources:                        
+            requests:                         
+              cpu: "200m"                      
+              memory: "256Mi"
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: EUREKA_SERVER
+              value: "http://eureka-server-pro-0.eureka-server-pro:8761/eureka/,http://eureka-server-pro-1.eureka-server-pro:8761/eureka/"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: ${MY_POD_NAME}.eureka-server-pro
+      nodeSelector:
+        zipkin: zipkin               
+  podManagementPolicy: "Parallel"

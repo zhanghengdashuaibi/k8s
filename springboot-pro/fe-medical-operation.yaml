@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe-medical-operation-pro
+  namespace: springboot-pro
+  labels:
+    app: fe-medical-operation-pro
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: fe-medical-operation-pro
+      nodePort: 8908
+  selector:
+    app: fe-medical-operation-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fe-medical-operation-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "fe-medical-operation-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fe-medical-operation-pro
+  template:
+    metadata:
+      labels:
+        app: fe-medical-operation-pro
+    spec:
+      containers:
+        - name: fe-medical-operation-pro
+          image: 192.168.5.4:82/csbr/fe-medical-operation-pro:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8906
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"

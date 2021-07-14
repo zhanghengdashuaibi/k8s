@@ -1,0 +1,47 @@
+# admin-server.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-server-pro
+  namespace: springboot-pro
+  labels:
+    app: admin-server-pro
+spec:
+  type: NodePort  
+  ports:
+    - port: 7086
+      name: admin-server-pro
+      nodePort: 7086
+  selector:
+    app: admin-server-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: admin-server-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "admin-server"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-server-pro
+  template:
+    metadata:
+      labels:
+        app: admin-server-pro
+    spec:
+      containers:
+        - name: admin-server-pro
+          image: 192.168.5.4:82/csbr/admin-server-pro:1.0-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7086
+          resources:                                  
+            requests:
+              cpu: "200m"                     
+              memory: "256Mi"
+      nodeSelector:
+        zipkin: zipkin              
+  podManagementPolicy: "Parallel"

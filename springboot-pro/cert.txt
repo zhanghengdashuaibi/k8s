@@ -1,0 +1,1 @@
+kubectl create secret tls https-ingress-secret --cert=_.csyaoly.com.crt --key=_.csyaoly.com.key -n springboot-pro

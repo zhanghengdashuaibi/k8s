@@ -1,0 +1,47 @@
+# zuul-statefulset.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zuul-server-pro
+  namespace: springboot-pro
+  labels:
+    app: zuul-server-pro
+spec:
+  type: NodePort  
+  ports:
+    - port: 8081
+      name: zuul-server-pro
+      nodePort: 8081
+  selector:
+    app: zuul-server-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zuul-server-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "zuul-server"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zuul-server-pro
+  template:
+    metadata:
+      labels:
+        app: zuul-server-pro
+    spec:
+      containers:
+        - name: zuul-server-pro
+          image: 192.168.5.4:82/csbr/zuul-server-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+          resources:                                  
+            requests:
+              cpu: "200m"                     
+              memory: "256Mi"
+      nodeSelector:
+        zipkin: zipkin              
+  podManagementPolicy: "Parallel"

@@ -1,0 +1,44 @@
+# ms-message-notification-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-message-notification-service-pro
+  namespace: springboot-pro
+  labels:
+    app: ms-message-notification-service-pro
+spec:
+  ports:
+    - port: 9103
+      name: ms-message-notification-service-pro
+  clusterIP: None
+  selector:
+    app: ms-message-notification-service-pro
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ms-message-notification-service-pro
+  namespace: springboot-pro
+spec:
+  serviceName: "ms-message-notification-service-pro"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-message-notification-service-pro
+  template:
+    metadata:
+      labels:
+        app: ms-message-notification-service-pro
+    spec:
+      containers:
+        - name: ms-message-notification-service-pro
+          image: 192.168.5.4:82/csbr/ms-message-notification-service-pro:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9103
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "256Mi"
+  podManagementPolicy: "Parallel"
